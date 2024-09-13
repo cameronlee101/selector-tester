@@ -1,7 +1,15 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 function IndexPopup() {
   const [data, setData] = useState("")
+  const [numOfElements, setNumOfElements] = useState("");
+
+  useEffect(() => {
+    chrome.storage.local.get("numOfElements", (result) => {
+      console.log("Found " + result.numOfElements + " elements")
+      setNumOfElements(result.numOfElements);
+    })
+  }, [])
 
   return (
     <div
@@ -19,6 +27,9 @@ function IndexPopup() {
       <a href="https://docs.plasmo.com" target="_blank">
         View Docs
       </a>
+      <p>
+        Num of elements: {numOfElements}
+      </p>
     </div>
   )
 }
