@@ -3,7 +3,8 @@ export type Request = {
 }
 
 export enum MessageType {
-  TO_POPUP, TO_SCRIPT
+  TO_POPUP,
+  TO_SCRIPT
 }
 
 export type PopupMessage = Request & {
