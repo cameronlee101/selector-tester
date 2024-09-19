@@ -1,31 +1,29 @@
 import React, { useState, type FormEvent } from "react"
 
 import {
-  MessageType,
-  type PopupMessage,
-  type Request,
-  type ScriptData
+  MsgType,
+  type MatchingElementMsg,
+  type Msg,
+  type NewSelectorMsg
 } from "./types"
 
 function IndexSidePanel() {
   const [selector, setSelector] = useState("")
   const [numOfElements, setNumOfElements] = useState(0)
 
-  chrome.runtime.onMessage.addListener(
-    (request: Request, sender, sendResponse) => {
-      if (request.type === MessageType.TO_POPUP) {
-        let castedRequest = request as ScriptData
+  chrome.runtime.onMessage.addListener((request: Msg, sender, sendResponse) => {
+    if (request.type === MsgType.MATCHING_ELEMENTS) {
+      let castedRequest = request as MatchingElementMsg
 
-        setNumOfElements(castedRequest.data.numOfElements)
-      }
+      setNumOfElements(castedRequest.data.numOfElements)
     }
-  )
+  })
 
   const submitSelector = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    let payload: PopupMessage = {
-      type: MessageType.TO_SCRIPT,
+    let payload: NewSelectorMsg = {
+      type: MsgType.NEW_SELECTOR,
       data: {
         selector: selector
       }

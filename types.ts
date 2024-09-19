@@ -1,21 +1,25 @@
-export type Request = {
-  type: MessageType
+export type Msg = {
+  type: MsgType
 }
 
-export enum MessageType {
-  TO_POPUP,
-  TO_SCRIPT
+export enum MsgType {
+  MATCHING_ELEMENTS,
+  NEW_SELECTOR
 }
 
-export type PopupMessage = Request & {
+export type NewSelectorData = {
   data: {
     selector: string
   }
 }
 
-export type ScriptData = Request & {
+export type NewSelectorMsg = Msg & NewSelectorData
+
+export type MatchingElementData = {
   data: {
     elements: string[]
     numOfElements: number
   }
 }
+
+export type MatchingElementMsg = Msg & MatchingElementData
