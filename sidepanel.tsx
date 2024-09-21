@@ -2,6 +2,7 @@ import React, { useState, type FormEvent } from "react"
 
 import {
   MsgType,
+  SelectorType,
   type MatchingElementMsg,
   type Msg,
   type NewSelectorMsg
@@ -10,21 +11,36 @@ import {
 function IndexSidePanel() {
   const [selector, setSelector] = useState("")
   const [numOfElements, setNumOfElements] = useState(0)
+  const [selectorType, setSelectorType] = useState(SelectorType.NONE)
 
-  chrome.runtime.onMessage.addListener((request: Msg, sender, sendResponse) => {
-    if (request.type === MsgType.MATCHING_ELEMENTS) {
-      let castedRequest = request as MatchingElementMsg
+  chrome.runtime.onMessage.addListener((msg: Msg, sender, sendResponse) => {
+    if (msg.type === MsgType.MATCHING_ELEMENTS) {
+      const typedMsg = msg as MatchingElementMsg
 
-      setNumOfElements(castedRequest.data.numOfElements)
+      setNumOfElements(typedMsg.data.numOfElements)
     }
   })
 
-  const submitSelector = (e: FormEvent<HTMLFormElement>) => {
+  function isXPath(selector: string) {
+    const xpathPattern = /^(\.\/|\/|\.\.|\/\/)/
+    return xpathPattern.test(selector)
+  }
+
+  function submitSelector(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
 
-    let payload: NewSelectorMsg = {
+    let curSelectorType: SelectorType = SelectorType.NONE
+    if (selector != "") {
+      curSelectorType = isXPath(selector)
+        ? SelectorType.XPATH
+        : SelectorType.CSS
+    }
+    setSelectorType(curSelectorType)
+
+    const payload: NewSelectorMsg = {
       type: MsgType.NEW_SELECTOR,
       data: {
+        selectorType: curSelectorType,
         selector: selector
       }
     }
@@ -43,6 +59,7 @@ function IndexSidePanel() {
       <form onSubmit={submitSelector}>
         <input onChange={(e) => setSelector(e.target.value)} value={selector} />
       </form>
+      <p>Detected selector type: {selectorType}</p>
       <p>Num of elements: {numOfElements}</p>
     </div>
   )

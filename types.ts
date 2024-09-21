@@ -7,8 +7,15 @@ export enum MsgType {
   NEW_SELECTOR
 }
 
+export enum SelectorType {
+  NONE = "None",
+  XPATH = "XPath",
+  CSS = "CSS"
+}
+
 export type NewSelectorData = {
   data: {
+    selectorType: SelectorType
     selector: string
   }
 }

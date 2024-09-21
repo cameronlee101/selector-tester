@@ -2,9 +2,10 @@ import "./types"
 
 import {
   MsgType,
+  SelectorType,
   type MatchingElementData,
-  type MatchingElementMsg,
   type Msg,
+  type NewSelectorData,
   type NewSelectorMsg
 } from "./types"
 
@@ -12,19 +13,20 @@ export {}
 
 const highlightAttrStr = "selector-id"
 
-chrome.runtime.onMessage.addListener((request: Msg, sender, sendResponse) => {
-  if (request.type === MsgType.NEW_SELECTOR) {
-    let castedRequest = request as NewSelectorMsg
+chrome.runtime.onMessage.addListener((msg: Msg, sender, sendResponse) => {
+  if (msg.type === MsgType.NEW_SELECTOR) {
+    const typedMsg = msg as NewSelectorMsg
+
     clearHighlightedElements()
-    let scriptData: MatchingElementData = highlightElements(
-      castedRequest.data.selector
-    )
+
+    const scriptData: MatchingElementData = highlightElements(typedMsg)
+
     sendData(scriptData)
   }
 })
 
-const clearHighlightedElements = () => {
-  let elementsToClear: NodeListOf<HTMLElement> = document.querySelectorAll(
+function clearHighlightedElements(): void {
+  const elementsToClear: NodeListOf<HTMLElement> = document.querySelectorAll(
     "[" + highlightAttrStr + "]"
   ) as NodeListOf<HTMLElement>
 
@@ -34,24 +36,17 @@ const clearHighlightedElements = () => {
   }
 }
 
-const highlightElements = (selector: string): MatchingElementData => {
-  try {
-    let matchingElements: NodeListOf<HTMLElement> = document.querySelectorAll(
-      selector
-    ) as NodeListOf<HTMLElement>
+function highlightElements(
+  newSelectorData: NewSelectorData
+): MatchingElementData {
+  const selector = newSelectorData.data.selector
 
-    for (let i = 0; i < matchingElements.length; i++) {
-      matchingElements[i].style.outline = "3px solid orange"
-      matchingElements[i].setAttribute(highlightAttrStr, i.toString())
-    }
-
-    return {
-      data: {
-        elements: [],
-        numOfElements: matchingElements.length
-      }
-    }
-  } catch {
+  let matchingElements: HTMLElement[]
+  if (newSelectorData.data.selectorType === SelectorType.XPATH) {
+    matchingElements = getElementsByXPath(selector)
+  } else if (newSelectorData.data.selectorType === SelectorType.CSS) {
+    matchingElements = getElementsByCSS(selector)
+  } else {
     return {
       data: {
         elements: [],
@@ -59,15 +54,48 @@ const highlightElements = (selector: string): MatchingElementData => {
       }
     }
   }
-}
 
-const sendData = (scriptData: MatchingElementData) => {
-  let payload: MatchingElementMsg = {
-    type: MsgType.MATCHING_ELEMENTS,
-    ...scriptData
+  for (let i = 0; i < matchingElements.length; i++) {
+    matchingElements[i].style.outline = "3px solid orange"
+    matchingElements[i].setAttribute(highlightAttrStr, i.toString())
   }
 
+  return {
+    data: {
+      elements: [],
+      numOfElements: matchingElements.length
+    }
+  }
+}
+
+function getElementsByXPath(xpath: string): HTMLElement[] {
+  const results: HTMLElement[] = []
+  const query = document.evaluate(
+    xpath,
+    document,
+    null,
+    XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+    null
+  )
+  for (let i = 0; i < query.snapshotLength; i++) {
+    const node = query.snapshotItem(i)
+    if (node instanceof HTMLElement) {
+      results.push(node)
+    }
+  }
+  return results
+}
+
+function getElementsByCSS(cssSelector: string): HTMLElement[] {
+  const matchingElements = document.querySelectorAll(cssSelector)
+  return Array.from(matchingElements).filter(
+    (node) => node instanceof HTMLElement
+  )
+}
+
+function sendData(scriptData: MatchingElementData) {
   chrome.runtime.sendMessage({
-    ...payload
+    type: MsgType.MATCHING_ELEMENTS,
+    ...scriptData
   })
 }
