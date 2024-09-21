@@ -49,8 +49,7 @@ function highlightElements(
   } else {
     return {
       data: {
-        elements: [],
-        numOfElements: 0
+        elements: []
       }
     }
   }
@@ -62,8 +61,7 @@ function highlightElements(
 
   return {
     data: {
-      elements: [],
-      numOfElements: matchingElements.length
+      elements: matchingElements.map((el) => el.outerHTML)
     }
   }
 }
@@ -94,6 +92,10 @@ function getElementsByCSS(cssSelector: string): HTMLElement[] {
 }
 
 function sendData(scriptData: MatchingElementData) {
+  console.log({
+    type: MsgType.MATCHING_ELEMENTS,
+    ...scriptData
+  })
   chrome.runtime.sendMessage({
     type: MsgType.MATCHING_ELEMENTS,
     ...scriptData

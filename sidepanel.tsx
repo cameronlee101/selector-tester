@@ -1,5 +1,7 @@
 import React, { useState, type FormEvent } from "react"
 
+import "./style.css"
+
 import {
   MsgType,
   SelectorType,
@@ -9,15 +11,18 @@ import {
 } from "./types"
 
 function IndexSidePanel() {
-  const [selector, setSelector] = useState("")
-  const [numOfElements, setNumOfElements] = useState(0)
-  const [selectorType, setSelectorType] = useState(SelectorType.NONE)
+  const [selector, setSelector] = useState<string>("")
+  const [matchingElements, setMatchingElements] = useState<String[]>([])
+  const [selectorType, setSelectorType] = useState<SelectorType>(
+    SelectorType.NONE
+  )
 
   chrome.runtime.onMessage.addListener((msg: Msg, sender, sendResponse) => {
     if (msg.type === MsgType.MATCHING_ELEMENTS) {
-      const typedMsg = msg as MatchingElementMsg
+      const typedMsg: MatchingElementMsg = msg as MatchingElementMsg
+      const elements: String[] = typedMsg.data.elements
 
-      setNumOfElements(typedMsg.data.numOfElements)
+      setMatchingElements(elements)
     }
   })
 
@@ -51,16 +56,27 @@ function IndexSidePanel() {
   }
 
   return (
-    <div
-      style={{
-        padding: 16
-      }}>
-      <h2>Welcome Selector-Tester Extension</h2>
-      <form onSubmit={submitSelector}>
-        <input onChange={(e) => setSelector(e.target.value)} value={selector} />
+    <div className="p-4">
+      <h2 className="text-2xl font-semibold mb-2">Selector-Tester Extension</h2>
+      <form className="mb-2" onSubmit={submitSelector}>
+        <input
+          className="border-2 border-gray-400 rounded-md focus:border-gray-900 text-sm mr-2"
+          onChange={(e) => setSelector(e.target.value)}
+          value={selector}
+        />
+        <button
+          className="bg-gray-200 p-1 py-0.5 rounded-lg border-gray-800 border-2"
+          type="submit">
+          Search
+        </button>
       </form>
-      <p>Detected selector type: {selectorType}</p>
-      <p>Num of elements: {numOfElements}</p>
+      <p className="mb-2 text-sm">Detected selector type: {selectorType}</p>
+      <p className="mb-2 text-sm">Num of elements: {matchingElements.length}</p>
+      <div>
+        {matchingElements.map((el) => (
+          <p className="mb-1">{el}</p>
+        ))}
+      </div>
     </div>
   )
 }

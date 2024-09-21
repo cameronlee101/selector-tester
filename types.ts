@@ -24,8 +24,7 @@ export type NewSelectorMsg = Msg & NewSelectorData
 
 export type MatchingElementData = {
   data: {
-    elements: string[]
-    numOfElements: number
+    elements: String[]
   }
 }
 
