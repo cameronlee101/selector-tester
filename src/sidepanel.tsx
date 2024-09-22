@@ -57,21 +57,25 @@ function IndexSidePanel() {
 
   return (
     <div className="p-4">
-      <h2 className="text-2xl font-semibold mb-2">Selector-Tester Extension</h2>
-      <form className="mb-2" onSubmit={submitSelector}>
-        <input
-          className="border-2 border-gray-400 rounded-md focus:border-gray-900 text-sm mr-2"
-          onChange={(e) => setSelector(e.target.value)}
-          value={selector}
-        />
-        <button
-          className="bg-gray-200 p-1 py-0.5 rounded-lg border-gray-800 border-2"
-          type="submit">
-          Search
-        </button>
-      </form>
-      <p className="mb-2 text-sm">Detected selector type: {selectorType}</p>
-      <p className="mb-2 text-sm">Num of elements: {matchingElements.length}</p>
+      <h2 className="text-2xl font-semibold">Selector-Tester Extension</h2>
+      <div className="my-6 space-y-2">
+        <form onSubmit={submitSelector}>
+          <input
+            className="border-2 border-gray-400 rounded-md p-0.5 focus:border-gray-900 text-sm mr-2"
+            onChange={(e) => setSelector(e.target.value)}
+            value={selector}
+          />
+          <button
+            className="bg-gray-200 p-1 py-0.5 rounded-lg border-gray-500 border-2 active:bg-gray-500"
+            type="submit">
+            Search
+          </button>
+        </form>
+        <p className="text-sm">Detected selector type: {selectorType}</p>
+        <p className="text-sm">
+          Number of matching elements: {matchingElements.length}
+        </p>
+      </div>
       <div>
         {matchingElements.map((el) => (
           <p className="mb-1">{el}</p>

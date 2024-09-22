@@ -1,4 +1,4 @@
-import "./types"
+import "../types"
 
 import {
   MsgType,
@@ -7,7 +7,7 @@ import {
   type Msg,
   type NewSelectorData,
   type NewSelectorMsg
-} from "./types"
+} from "../types"
 
 export {}
 
