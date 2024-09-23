@@ -4,7 +4,9 @@ export type Msg = {
 
 export enum MsgType {
   MATCHING_ELEMENTS,
-  NEW_SELECTOR
+  NEW_SELECTOR,
+  BEGIN_HOVER_MATCHING_ELEMENT,
+  END_HOVER_MATCHING_ELEMENT
 }
 
 export enum SelectorType {
@@ -24,8 +26,16 @@ export type NewSelectorMsg = Msg & NewSelectorData
 
 export type MatchingElementData = {
   data: {
-    elements: String[]
+    elements: string[]
   }
 }
 
 export type MatchingElementMsg = Msg & MatchingElementData
+
+export type HoverMatchingElementData = {
+  data: {
+    selectorId: number
+  }
+}
+
+export type HoverMatchingElementMsg = Msg & HoverMatchingElementData

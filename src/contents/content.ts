@@ -1,13 +1,12 @@
-import "../types"
-
 import {
   MsgType,
   SelectorType,
+  type HoverMatchingElementMsg,
   type MatchingElementData,
   type Msg,
   type NewSelectorData,
   type NewSelectorMsg
-} from "../types"
+} from "~/types"
 
 export {}
 
@@ -22,6 +21,14 @@ chrome.runtime.onMessage.addListener((msg: Msg, sender, sendResponse) => {
     const scriptData: MatchingElementData = highlightElements(typedMsg)
 
     sendData(scriptData)
+  } else if (msg.type === MsgType.BEGIN_HOVER_MATCHING_ELEMENT) {
+    const typedMsg = msg as HoverMatchingElementMsg
+
+    hoverHighlightElement(typedMsg.data.selectorId)
+  } else if (msg.type === MsgType.END_HOVER_MATCHING_ELEMENT) {
+    const typedMsg = msg as HoverMatchingElementMsg
+
+    stopHoverHighlightElement(typedMsg.data.selectorId)
   }
 })
 
@@ -92,12 +99,32 @@ function getElementsByCSS(cssSelector: string): HTMLElement[] {
 }
 
 function sendData(scriptData: MatchingElementData) {
-  console.log({
-    type: MsgType.MATCHING_ELEMENTS,
-    ...scriptData
-  })
   chrome.runtime.sendMessage({
     type: MsgType.MATCHING_ELEMENTS,
     ...scriptData
   })
+}
+
+function hoverHighlightElement(selectorId: number) {
+  const hoverElement: HTMLElement[] = getElementsByCSS(
+    "[" + highlightAttrStr + "='" + selectorId + "']"
+  )
+
+  if (hoverElement.length != 1) {
+    console.error("Something went wrong when highlighting the hovered element")
+  }
+
+  hoverElement[0].style.outline = "3px solid red"
+}
+
+function stopHoverHighlightElement(selectorId: number) {
+  const hoverElement: HTMLElement[] = getElementsByCSS(
+    "[" + highlightAttrStr + "='" + selectorId + "']"
+  )
+
+  if (hoverElement.length != 1) {
+    console.error("Something went wrong when highlighting the hovered element")
+  }
+
+  hoverElement[0].style.outline = "3px solid orange"
 }

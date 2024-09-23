@@ -1,18 +1,20 @@
 import React, { useState, type FormEvent } from "react"
 
-import "./style.css"
+import "~/style.css"
 
+import MatchingElementInfo from "~/components/MatchingElementInfo"
 import {
   MsgType,
   SelectorType,
   type MatchingElementMsg,
   type Msg,
   type NewSelectorMsg
-} from "./types"
+} from "~/types"
+import { sendMsgToTab } from "~utils"
 
 function IndexSidePanel() {
   const [selector, setSelector] = useState<string>("")
-  const [matchingElements, setMatchingElements] = useState<String[]>([])
+  const [matchingElements, setMatchingElements] = useState<string[]>([])
   const [selectorType, setSelectorType] = useState<SelectorType>(
     SelectorType.NONE
   )
@@ -20,7 +22,7 @@ function IndexSidePanel() {
   chrome.runtime.onMessage.addListener((msg: Msg, sender, sendResponse) => {
     if (msg.type === MsgType.MATCHING_ELEMENTS) {
       const typedMsg: MatchingElementMsg = msg as MatchingElementMsg
-      const elements: String[] = typedMsg.data.elements
+      const elements: string[] = typedMsg.data.elements
 
       setMatchingElements(elements)
     }
@@ -50,9 +52,7 @@ function IndexSidePanel() {
       }
     }
 
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.tabs.sendMessage(tabs[0].id, { ...payload })
-    })
+    sendMsgToTab(payload)
   }
 
   return (
@@ -77,9 +77,9 @@ function IndexSidePanel() {
         </p>
       </div>
       <div>
-        {matchingElements.map((el) => (
-          <p className="mb-1">{el}</p>
-        ))}
+        {matchingElements.map((el, selectorId) =>
+          MatchingElementInfo(el, selectorId)
+        )}
       </div>
     </div>
   )
