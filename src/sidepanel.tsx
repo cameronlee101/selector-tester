@@ -74,23 +74,25 @@ function IndexSidePanel() {
     <div className="p-4">
       <h2 className="text-2xl font-semibold">Selector-Tester Extension</h2>
       <div className="my-6 space-y-2">
-        <form onSubmit={submitSelector} className="flex">
+        <form onSubmit={submitSelector} className="flex flex-col mb-4">
           <input
             className="border-2 border-gray-400 rounded-md p-0.5 focus:border-gray-900 text-sm mr-2"
             onChange={(e) => setSelector(e.target.value)}
             value={selector}
           />
-          <button
-            className="bg-gray-200 p-1 py-0.5 rounded-lg border-gray-500 border-2 active:bg-gray-500 mr-2"
-            type="submit">
-            Search
-          </button>
-          <button
-            className="bg-gray-200 p-1 py-0.5 rounded-lg border-gray-500 border-2 active:bg-gray-500"
-            onClick={clearAll}
-            type="button">
-            Clear
-          </button>
+          <div className="mt-2">
+            <button
+              className="bg-gray-200 p-1 py-0.5 rounded-lg border-gray-500 border-2 active:bg-gray-500 mr-2"
+              type="submit">
+              Search
+            </button>
+            <button
+              className="bg-gray-200 p-1 py-0.5 rounded-lg border-gray-500 border-2 active:bg-gray-500"
+              onClick={clearAll}
+              type="button">
+              Clear
+            </button>
+          </div>
         </form>
         <p className="text-sm">Detected selector type: {selectorType}</p>
         <p className="text-sm">
