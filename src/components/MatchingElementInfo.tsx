@@ -2,8 +2,14 @@ import React from "react"
 
 import "~/style.css"
 
-import { MsgType, type HoverMatchingElementMsg } from "~types"
-import { sendMsgToTab } from "~utils"
+import { MsgType, type HoverMatchingElementMsg, type Msg } from "~types"
+
+// this function used to be exported from a utils.ts file so that it can be shared, but plasmo dies when i try to run build or dev like that so i have duplicated code now :)
+function sendMsgToTab(payload: Msg) {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.sendMessage(tabs[0].id, { ...payload })
+  })
+}
 
 function MatchingElementInfo(element: String, selectorId: number) {
   function hoverHighlightElement() {

@@ -10,7 +10,13 @@ import {
   type Msg,
   type NewSelectorMsg
 } from "~/types"
-import { sendMsgToTab } from "~utils"
+
+// this function used to be exported from a utils.ts file so that it can be shared, but plasmo dies when i try to run build or dev like that so i have duplicated code now :)
+function sendMsgToTab(payload: Msg) {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.sendMessage(tabs[0].id, { ...payload })
+  })
+}
 
 function IndexSidePanel() {
   const [selector, setSelector] = useState<string>("")
