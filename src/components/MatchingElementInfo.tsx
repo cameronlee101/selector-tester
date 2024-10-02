@@ -36,7 +36,7 @@ function MatchingElementInfo(element: String, selectorId: number) {
 
   return (
     <p
-      className="mb-1 border-2 border-gray-400 border-solid hover:cursor-default"
+      className="mb-1 border-2 border-gray-400 border-solid hover:cursor-default hover:border-gray-500"
       key={selectorId}
       onMouseEnter={hoverHighlightElement}
       onMouseLeave={stopHoverHighlightElement}>
