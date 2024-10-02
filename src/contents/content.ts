@@ -32,6 +32,7 @@ chrome.runtime.onMessage.addListener((msg: Msg, sender, sendResponse) => {
   }
 })
 
+// Clears all the elements of outlines in the document
 function clearHighlightedElements(): void {
   const elementsToClear: NodeListOf<HTMLElement> = document.querySelectorAll(
     "[" + highlightAttrStr + "]"
@@ -43,6 +44,7 @@ function clearHighlightedElements(): void {
   }
 }
 
+// Gets element using a selector, then sets the selector attribute and gives the elements an outline
 function highlightElements(
   newSelectorData: NewSelectorData
 ): MatchingElementData {
@@ -68,11 +70,12 @@ function highlightElements(
 
   return {
     data: {
-      elements: matchingElements.map((el) => el.outerHTML)
+      elements: matchingElements.map((el) => getOutermostElement(el.outerHTML))
     }
   }
 }
 
+// Gets HTML elements by XPath
 function getElementsByXPath(xpath: string): HTMLElement[] {
   const results: HTMLElement[] = []
   const query = document.evaluate(
@@ -91,6 +94,7 @@ function getElementsByXPath(xpath: string): HTMLElement[] {
   return results
 }
 
+// Gets HTML elements by CSS
 function getElementsByCSS(cssSelector: string): HTMLElement[] {
   const matchingElements = document.querySelectorAll(cssSelector)
   return Array.from(matchingElements).filter(
@@ -98,6 +102,7 @@ function getElementsByCSS(cssSelector: string): HTMLElement[] {
   )
 }
 
+// Sends data to the sidebar via chrome api
 function sendData(scriptData: MatchingElementData) {
   chrome.runtime.sendMessage({
     type: MsgType.MATCHING_ELEMENTS,
@@ -105,6 +110,7 @@ function sendData(scriptData: MatchingElementData) {
   })
 }
 
+// Changes the color of the outline of HTML element in the document that the user is hovering in the sidebar
 function hoverHighlightElement(selectorId: number) {
   const hoverElement: HTMLElement[] = getElementsByCSS(
     "[" + highlightAttrStr + "='" + selectorId + "']"
@@ -117,6 +123,7 @@ function hoverHighlightElement(selectorId: number) {
   hoverElement[0].style.outline = "3px solid red"
 }
 
+// Returns the color of the outline of HTML element in the document that the user stopped hoering in the sidebar back to normal
 function stopHoverHighlightElement(selectorId: number) {
   const hoverElement: HTMLElement[] = getElementsByCSS(
     "[" + highlightAttrStr + "='" + selectorId + "']"
@@ -127,4 +134,54 @@ function stopHoverHighlightElement(selectorId: number) {
   }
 
   hoverElement[0].style.outline = "3px solid orange"
+}
+
+// TODO: this currently always returns elements in the form of <div>...</div>, should only happen if there's a closing tag and there's stuff inside
+// TODO: check if there's other elements that need special handling, and if there's a more general way to do it
+// Given a string containing HTML, returns the outermost element with ... representing the inner elements
+function getOutermostElement(html: string): string {
+  const trimmedHtml = html.trim()
+
+  // Create a temporary container
+  const tempDiv = document.createElement("div")
+
+  // Handle specific cases for table elements by providing an appropriate wrapper
+  if (trimmedHtml.startsWith("<td")) {
+    tempDiv.innerHTML = `<table><tbody><tr>${trimmedHtml}</tr></tbody></table>`
+    const tableElement = tempDiv.querySelector("td")
+    return tableElement ? formatElement(tableElement) : ""
+  } else if (trimmedHtml.startsWith("<tr")) {
+    tempDiv.innerHTML = `<table><tbody>${trimmedHtml}</tbody></table>`
+    const tableElement = tempDiv.querySelector("tr")
+    return tableElement ? formatElement(tableElement) : ""
+  } else if (
+    trimmedHtml.startsWith("<thead") ||
+    trimmedHtml.startsWith("<tbody")
+  ) {
+    tempDiv.innerHTML = `<table>${trimmedHtml}</table>`
+    const tableSection =
+      tempDiv.querySelector("thead") || tempDiv.querySelector("tbody")
+    return tableSection ? formatElement(tableSection) : ""
+  } else if (trimmedHtml.startsWith("<table")) {
+    tempDiv.innerHTML = trimmedHtml
+    const tableElement = tempDiv.querySelector("table")
+    return tableElement ? formatElement(tableElement) : ""
+  } else {
+    tempDiv.innerHTML = trimmedHtml
+    const outermostElement = tempDiv.firstElementChild
+    return outermostElement ? formatElement(outermostElement) : ""
+  }
+}
+
+// Helper function to format the element into a string with "..."
+function formatElement(element: Element): string {
+  const tagName = element.tagName.toLowerCase()
+  const attributes = Array.from(element.attributes)
+    .map((attr) => `${attr.name}="${attr.value}"`)
+    .join(" ")
+
+  const openingTag = attributes ? `<${tagName} ${attributes}>` : `<${tagName}>`
+  const closingTag = `</${tagName}>`
+
+  return `${openingTag}...${closingTag}`
 }

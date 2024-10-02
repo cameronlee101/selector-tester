@@ -77,7 +77,7 @@ function IndexSidePanel() {
   }
 
   return (
-    <div className="p-4">
+    <main className="p-3 h-screen flex flex-col">
       <h2 className="text-2xl font-semibold">Selector-Tester Extension</h2>
       <div className="my-6 space-y-2">
         <form onSubmit={submitSelector} className="flex flex-col mb-4">
@@ -105,12 +105,12 @@ function IndexSidePanel() {
           Number of matching elements: {matchingElements.length}
         </p>
       </div>
-      <div>
+      <div className="overflow-y-scroll overflow-x-clip">
         {matchingElements.map((el, selectorId) =>
           MatchingElementInfo(el, selectorId)
         )}
       </div>
-    </div>
+    </main>
   )
 }
 
