@@ -8,8 +8,6 @@ import {
   type NewSelectorMsg
 } from "~/types"
 
-export {}
-
 const highlightAttrStr = "selector-id"
 
 chrome.runtime.onMessage.addListener((msg: Msg, sender, sendResponse) => {
@@ -70,7 +68,7 @@ function highlightElements(
 
   return {
     data: {
-      elements: matchingElements.map((el) => getOutermostElement(el.outerHTML))
+      elements: matchingElements.map((el) => getOutermostElementStr(el))
     }
   }
 }
@@ -136,52 +134,25 @@ function stopHoverHighlightElement(selectorId: number) {
   hoverElement[0].style.outline = "3px solid orange"
 }
 
-// TODO: this currently always returns elements in the form of <div>...</div>, should only happen if there's a closing tag and there's stuff inside
-// TODO: check if there's other elements that need special handling, and if there's a more general way to do it
-// Given a string containing HTML, returns the outermost element with ... representing the inner elements
-function getOutermostElement(html: string): string {
-  const trimmedHtml = html.trim()
-
-  // Create a temporary container
-  const tempDiv = document.createElement("div")
-
-  // Handle specific cases for table elements by providing an appropriate wrapper
-  if (trimmedHtml.startsWith("<td")) {
-    tempDiv.innerHTML = `<table><tbody><tr>${trimmedHtml}</tr></tbody></table>`
-    const tableElement = tempDiv.querySelector("td")
-    return tableElement ? formatElement(tableElement) : ""
-  } else if (trimmedHtml.startsWith("<tr")) {
-    tempDiv.innerHTML = `<table><tbody>${trimmedHtml}</tbody></table>`
-    const tableElement = tempDiv.querySelector("tr")
-    return tableElement ? formatElement(tableElement) : ""
-  } else if (
-    trimmedHtml.startsWith("<thead") ||
-    trimmedHtml.startsWith("<tbody")
-  ) {
-    tempDiv.innerHTML = `<table>${trimmedHtml}</table>`
-    const tableSection =
-      tempDiv.querySelector("thead") || tempDiv.querySelector("tbody")
-    return tableSection ? formatElement(tableSection) : ""
-  } else if (trimmedHtml.startsWith("<table")) {
-    tempDiv.innerHTML = trimmedHtml
-    const tableElement = tempDiv.querySelector("table")
-    return tableElement ? formatElement(tableElement) : ""
+// Given an HTML element, returns a string representation of that element with ... representing the inner elements
+function getOutermostElementStr(htmlElement: HTMLElement): string {
+  if (htmlElement == null) {
+    return ""
   } else {
-    tempDiv.innerHTML = trimmedHtml
-    const outermostElement = tempDiv.firstElementChild
-    return outermostElement ? formatElement(outermostElement) : ""
+    const tagName: string = htmlElement.tagName.toLowerCase()
+    const attributes: string = Array.from(htmlElement.attributes)
+      .map((attr) => `${attr.name}="${attr.value}"`)
+      .join(" ")
+
+    const openingTag: string = attributes
+      ? `<${tagName} ${attributes}>`
+      : `<${tagName}>`
+    const closingTag: string = `</${tagName}>`
+
+    if (htmlElement.innerHTML === "") {
+      return `${openingTag}${closingTag}`
+    } else {
+      return `${openingTag}...${closingTag}`
+    }
   }
-}
-
-// Helper function to format the element into a string with "..."
-function formatElement(element: Element): string {
-  const tagName = element.tagName.toLowerCase()
-  const attributes = Array.from(element.attributes)
-    .map((attr) => `${attr.name}="${attr.value}"`)
-    .join(" ")
-
-  const openingTag = attributes ? `<${tagName} ${attributes}>` : `<${tagName}>`
-  const closingTag = `</${tagName}>`
-
-  return `${openingTag}...${closingTag}`
 }
