@@ -1,25 +1,27 @@
 import React, { useState, type FormEvent } from "react"
 
-import "~/style.css"
+import "~style.css"
 
-import MatchingElementInfo from "~/components/MatchingElementInfo"
+import MatchingElementInfo from "~components/MatchingElementInfo"
 import {
   MsgType,
   SelectorType,
   type MatchingElementMsg,
   type Msg,
   type NewSelectorMsg
-} from "~/types"
+} from "~types"
+import { sendMsgToTab } from "~utils"
 
-// this function used to be exported from a utils.ts file so that it can be shared, but plasmo dies when i try to run build or dev like that so i have duplicated code now :)
-function sendMsgToTab(payload: Msg) {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.tabs.sendMessage(tabs[0].id, { ...payload })
-  })
+type FormData = {
+  selector: string
+  onlyVisibleElements: boolean
 }
 
 function IndexSidePanel() {
-  const [selector, setSelector] = useState<string>("")
+  const [formData, setFormData] = useState<FormData>({
+    selector: "",
+    onlyVisibleElements: false
+  })
   const [matchingElements, setMatchingElements] = useState<string[]>([])
   const [selectorType, setSelectorType] = useState<SelectorType>(
     SelectorType.NONE
@@ -43,8 +45,8 @@ function IndexSidePanel() {
     e.preventDefault()
 
     let curSelectorType: SelectorType = SelectorType.NONE
-    if (selector != "") {
-      curSelectorType = isXPath(selector)
+    if (formData.selector) {
+      curSelectorType = isXPath(formData.selector)
         ? SelectorType.XPATH
         : SelectorType.CSS
     }
@@ -54,7 +56,8 @@ function IndexSidePanel() {
       type: MsgType.NEW_SELECTOR,
       data: {
         selectorType: curSelectorType,
-        selector: selector
+        selector: formData.selector,
+        onlyVisibleElements: formData.onlyVisibleElements
       }
     }
 
@@ -62,14 +65,18 @@ function IndexSidePanel() {
   }
 
   function clearAll() {
-    setSelector("")
+    setFormData({
+      ...formData,
+      selector: ""
+    })
     setSelectorType(SelectorType.NONE)
 
     const payload: NewSelectorMsg = {
       type: MsgType.NEW_SELECTOR,
       data: {
         selectorType: SelectorType.NONE,
-        selector: ""
+        selector: "",
+        onlyVisibleElements: formData.onlyVisibleElements
       }
     }
 
@@ -82,11 +89,37 @@ function IndexSidePanel() {
       <div className="my-6 space-y-2">
         <form onSubmit={submitSelector} className="flex flex-col mb-4">
           <input
+            type="text"
             className="border-2 border-gray-400 rounded-md p-0.5 focus:border-gray-900 text-sm mr-2"
-            onChange={(e) => setSelector(e.target.value)}
-            value={selector}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                selector: e.target.value
+              })
+            }
+            value={formData.selector}
           />
-          <div className="mt-2">
+          <div className="flex mt-2">
+            <input
+              id="visibleElements"
+              name="visibleElements"
+              type="checkbox"
+              className="mr-2 h-4 w-4 self-center hover:cursor-pointer"
+              checked={formData.onlyVisibleElements}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  onlyVisibleElements: e.target.checked
+                })
+              }
+            />
+            <label
+              htmlFor="visibleElements"
+              className="text-sm hover:cursor-pointer select-none">
+              Only Visible Elements
+            </label>
+          </div>
+          <div className="mt-4">
             <button
               className="bg-gray-200 p-1 py-0.5 rounded-lg border-gray-500 border-2 active:bg-gray-500 mr-2"
               type="submit">

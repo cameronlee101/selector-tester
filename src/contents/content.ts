@@ -6,7 +6,7 @@ import {
   type Msg,
   type NewSelectorData,
   type NewSelectorMsg
-} from "~/types"
+} from "~types"
 
 const highlightAttrStr = "selector-id"
 
@@ -61,11 +61,25 @@ function highlightElements(
     }
   }
 
+  // Filtering by visible elements if enabled
+  if (newSelectorData.data.onlyVisibleElements) {
+    matchingElements = matchingElements.filter((el) => {
+      const style = el.style
+      return (
+        style.display != "none" &&
+        style.visibility != "hidden" &&
+        style.opacity != "0"
+      )
+    })
+  }
+
+  // Outlining matching elements
   for (let i = 0; i < matchingElements.length; i++) {
     matchingElements[i].style.outline = "3px solid orange"
     matchingElements[i].setAttribute(highlightAttrStr, i.toString())
   }
 
+  // Return matching element data in the form of <>...</>
   return {
     data: {
       elements: matchingElements.map((el) => getOutermostElementStr(el))
