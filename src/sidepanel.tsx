@@ -83,6 +83,33 @@ function IndexSidePanel() {
     sendMsgToTab(payload)
   }
 
+  function renderFilterList(): React.JSX.Element {
+    return (
+      <>
+        <div className="flex items-center h-full my-0.5">
+          <input
+            id="visibleElements"
+            name="visibleElements"
+            type="checkbox"
+            className="mr-2 h-4 w-4 hover:cursor-pointer"
+            checked={formData.onlyVisibleElements}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                onlyVisibleElements: e.target.checked
+              })
+            }
+          />
+          <label
+            htmlFor="visibleElements"
+            className="text-sm hover:cursor-pointer select-none">
+            Visible
+          </label>
+        </div>
+      </>
+    )
+  }
+
   return (
     <main className="p-3 h-screen flex flex-col">
       <h2 className="text-2xl font-semibold">Selector-Tester Extension</h2>
@@ -90,7 +117,7 @@ function IndexSidePanel() {
         <form onSubmit={submitSelector} className="flex flex-col mb-4">
           <input
             type="text"
-            className="border-2 border-gray-400 rounded-md p-0.5 focus:border-gray-900 text-sm mr-2"
+            className="border-2 border-gray-400 rounded-md p-0.5 focus:border-gray-900 text-sm"
             onChange={(e) =>
               setFormData({
                 ...formData,
@@ -99,41 +126,27 @@ function IndexSidePanel() {
             }
             value={formData.selector}
           />
-          <div className="flex mt-2">
-            <input
-              id="visibleElements"
-              name="visibleElements"
-              type="checkbox"
-              className="mr-2 h-4 w-4 self-center hover:cursor-pointer"
-              checked={formData.onlyVisibleElements}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  onlyVisibleElements: e.target.checked
-                })
-              }
-            />
-            <label
-              htmlFor="visibleElements"
-              className="text-sm hover:cursor-pointer select-none">
-              Only Visible Elements
-            </label>
-          </div>
-          <div className="mt-4">
-            <button
-              className="bg-gray-200 p-1 py-0.5 rounded-lg border-gray-500 border-2 active:bg-gray-500 mr-2"
-              type="submit">
-              Search
-            </button>
-            <button
-              className="bg-gray-200 p-1 py-0.5 rounded-lg border-gray-500 border-2 active:bg-gray-500"
-              onClick={clearAll}
-              type="button">
-              Clear
-            </button>
+          <div className="flex mt-2 w-full">
+            <div className="flex flex-col w-1/2">
+              <p className="text-sm mb-0.5">Filters:</p>
+              {renderFilterList()}
+            </div>
+            <div className="flex w-1/2 justify-end gap-x-2">
+              <button
+                className="bg-gray-200 p-1.5 py-0.5 w-fit h-fit rounded-lg text-sm border-gray-500 border-2 active:bg-gray-500"
+                type="submit">
+                Search
+              </button>
+              <button
+                className="bg-gray-200 p-1.5 py-0.5 w-fit h-fit rounded-lg text-sm border-gray-500 border-2 active:bg-gray-500"
+                onClick={clearAll}
+                type="button">
+                Clear
+              </button>
+            </div>
           </div>
         </form>
-        <p className="text-sm">Detected selector type: {selectorType}</p>
+        <p>Detected selector type: {selectorType}</p>
         <p className="text-sm">
           Number of matching elements: {matchingElements.length}
         </p>
