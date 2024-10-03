@@ -73,6 +73,18 @@ function highlightElements(
     })
   }
 
+  // Filtering by selected elements if enabled
+  if (newSelectorData.data.onlySelectedElements) {
+    // TODO
+  }
+
+  // Filtering by enabled elements if enabled
+  if (newSelectorData.data.onlyEnabledElements) {
+    matchingElements = matchingElements.filter((el) => {
+      return !(el.getAttribute("disabled") === "disabled")
+    })
+  }
+
   // Outlining matching elements
   for (let i = 0; i < matchingElements.length; i++) {
     matchingElements[i].style.outline = "3px solid orange"

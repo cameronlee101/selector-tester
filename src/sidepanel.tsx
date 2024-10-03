@@ -2,6 +2,8 @@ import React, { useState, type FormEvent } from "react"
 
 import "~style.css"
 
+import classNames from "classnames"
+
 import MatchingElementInfo from "~components/MatchingElementInfo"
 import {
   MsgType,
@@ -15,12 +17,16 @@ import { sendMsgToTab } from "~utils"
 type FormData = {
   selector: string
   onlyVisibleElements: boolean
+  onlySelectedElements: boolean
+  onlyEnabledElements: boolean
 }
 
 function IndexSidePanel() {
   const [formData, setFormData] = useState<FormData>({
     selector: "",
-    onlyVisibleElements: false
+    onlyVisibleElements: false,
+    onlySelectedElements: false,
+    onlyEnabledElements: false
   })
   const [matchingElements, setMatchingElements] = useState<string[]>([])
   const [selectorType, setSelectorType] = useState<SelectorType>(
@@ -55,9 +61,8 @@ function IndexSidePanel() {
     const payload: NewSelectorMsg = {
       type: MsgType.NEW_SELECTOR,
       data: {
-        selectorType: curSelectorType,
-        selector: formData.selector,
-        onlyVisibleElements: formData.onlyVisibleElements
+        ...formData,
+        selectorType: curSelectorType
       }
     }
 
@@ -74,9 +79,9 @@ function IndexSidePanel() {
     const payload: NewSelectorMsg = {
       type: MsgType.NEW_SELECTOR,
       data: {
+        ...formData,
         selectorType: SelectorType.NONE,
-        selector: "",
-        onlyVisibleElements: formData.onlyVisibleElements
+        selector: ""
       }
     }
 
@@ -104,6 +109,26 @@ function IndexSidePanel() {
             htmlFor="visibleElements"
             className="text-sm hover:cursor-pointer select-none">
             Visible
+          </label>
+        </div>
+        <div className="flex items-center h-full my-0.5">
+          <input
+            id="enabledElements"
+            name="enabledElements"
+            type="checkbox"
+            className="mr-2 h-4 w-4 hover:cursor-pointer"
+            checked={formData.onlyEnabledElements}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                onlyEnabledElements: e.target.checked
+              })
+            }
+          />
+          <label
+            htmlFor="enabledElements"
+            className="text-sm hover:cursor-pointer select-none">
+            Enabled
           </label>
         </div>
       </>
@@ -147,7 +172,15 @@ function IndexSidePanel() {
           </div>
         </form>
         <p>Detected selector type: {selectorType}</p>
-        <p className="text-sm">
+        <p
+          className={classNames(
+            "text-sm px-1 w-fit rounded-md",
+            matchingElements.length === 1
+              ? "bg-green-300"
+              : matchingElements.length === 0
+                ? ""
+                : "bg-red-300"
+          )}>
           Number of matching elements: {matchingElements.length}
         </p>
       </div>

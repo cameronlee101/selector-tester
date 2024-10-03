@@ -20,6 +20,8 @@ export type NewSelectorData = {
     selectorType: SelectorType
     selector: string
     onlyVisibleElements: boolean
+    onlySelectedElements: boolean
+    onlyEnabledElements: boolean
   }
 }
 
