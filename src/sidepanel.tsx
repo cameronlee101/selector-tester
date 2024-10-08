@@ -171,7 +171,7 @@ function IndexSidePanel() {
             </div>
           </div>
         </form>
-        <p>Detected selector type: {selectorType}</p>
+        <p className="px-1">Detected selector type: {selectorType}</p>
         <p
           className={classNames(
             "text-sm px-1 w-fit rounded-md",
