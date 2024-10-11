@@ -10,11 +10,13 @@ function FilterToggle(
         id={id}
         name={id}
         type="checkbox"
-        className="mr-2 h-4 w-4 hover:cursor-pointer"
+        className="h-4 w-4 hover:cursor-pointer"
         checked={checked}
         onChange={onChange}
       />
-      <label htmlFor={id} className="text-sm hover:cursor-pointer select-none">
+      <label
+        htmlFor={id}
+        className="px-2 text-sm hover:cursor-pointer select-none w-fit">
         {filterName}
       </label>
     </div>

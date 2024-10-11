@@ -142,7 +142,7 @@ function IndexSidePanel() {
     <main className="p-3 h-screen flex flex-col">
       <h2 className="text-2xl font-semibold">Selector-Tester Extension</h2>
       <div className="my-6 space-y-2">
-        <form onSubmit={submitSelector} className="flex flex-col mb-4">
+        <form onSubmit={submitSelector} className="flex flex-col mb-2">
           <input
             type="text"
             className="border-2 border-gray-400 rounded-md p-0.5 focus:border-gray-900 text-sm"
