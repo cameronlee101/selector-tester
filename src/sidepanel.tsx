@@ -4,6 +4,7 @@ import "~style.css"
 
 import classNames from "classnames"
 
+import FilterToggle from "~components/FilterToggle"
 import MatchingElementInfo from "~components/MatchingElementInfo"
 import {
   MsgType,
@@ -14,8 +15,9 @@ import {
 } from "~types"
 import { sendMsgToTab } from "~utils"
 
-type FormData = {
+export type FormData = {
   selector: string
+  onlyDisplayedElements: boolean
   onlyVisibleElements: boolean
   onlySelectedElements: boolean
   onlyEnabledElements: boolean
@@ -24,6 +26,7 @@ type FormData = {
 function IndexSidePanel() {
   const [formData, setFormData] = useState<FormData>({
     selector: "",
+    onlyDisplayedElements: false,
     onlyVisibleElements: false,
     onlySelectedElements: false,
     onlyEnabledElements: false
@@ -91,46 +94,46 @@ function IndexSidePanel() {
   function renderFilterList(): React.JSX.Element {
     return (
       <>
-        <div className="flex items-center h-full my-0.5">
-          <input
-            id="visibleElements"
-            name="visibleElements"
-            type="checkbox"
-            className="mr-2 h-4 w-4 hover:cursor-pointer"
-            checked={formData.onlyVisibleElements}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                onlyVisibleElements: e.target.checked
-              })
-            }
-          />
-          <label
-            htmlFor="visibleElements"
-            className="text-sm hover:cursor-pointer select-none">
-            Visible
-          </label>
-        </div>
-        <div className="flex items-center h-full my-0.5">
-          <input
-            id="enabledElements"
-            name="enabledElements"
-            type="checkbox"
-            className="mr-2 h-4 w-4 hover:cursor-pointer"
-            checked={formData.onlyEnabledElements}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                onlyEnabledElements: e.target.checked
-              })
-            }
-          />
-          <label
-            htmlFor="enabledElements"
-            className="text-sm hover:cursor-pointer select-none">
-            Enabled
-          </label>
-        </div>
+        {FilterToggle(
+          "displayedElements",
+          "Displayed",
+          formData.onlyDisplayedElements,
+          (e) =>
+            setFormData({
+              ...formData,
+              onlyDisplayedElements: e.target.checked
+            })
+        )}
+        {FilterToggle(
+          "visibleElements",
+          "Visible",
+          formData.onlyVisibleElements,
+          (e) =>
+            setFormData({
+              ...formData,
+              onlyVisibleElements: e.target.checked
+            })
+        )}
+        {FilterToggle(
+          "selectedElements",
+          "Selected",
+          formData.onlySelectedElements,
+          (e) =>
+            setFormData({
+              ...formData,
+              onlySelectedElements: e.target.checked
+            })
+        )}
+        {FilterToggle(
+          "enabledElements",
+          "Enabled",
+          formData.onlyEnabledElements,
+          (e) =>
+            setFormData({
+              ...formData,
+              onlyEnabledElements: e.target.checked
+            })
+        )}
       </>
     )
   }

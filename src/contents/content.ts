@@ -61,6 +61,27 @@ function highlightElements(
     }
   }
 
+  // Filtering by displayed elements if enabled
+  if (newSelectorData.data.onlyDisplayedElements) {
+    matchingElements = matchingElements.filter((el) => {
+      // Check if element is part of the DOM and visible (offsetWidth and offsetHeight > 0)
+      const isVisible = el.offsetWidth > 0 && el.offsetHeight > 0
+
+      // Check for computed styles: 'display' and 'visibility'
+      const computedStyle = window.getComputedStyle(el)
+      const isDisplayed =
+        computedStyle.display !== "none" &&
+        computedStyle.visibility !== "hidden"
+
+      // Check if the element can be clicked: Not disabled and pointer-events are not set to none
+      const isClickable =
+        computedStyle.pointerEvents !== "none" && !el.hasAttribute("disabled")
+
+      // Element is considered displayed and clickable if all conditions are met
+      return isVisible && isDisplayed && isClickable
+    })
+  }
+
   // Filtering by visible elements if enabled
   if (newSelectorData.data.onlyVisibleElements) {
     matchingElements = matchingElements.filter((el) => {
@@ -75,7 +96,9 @@ function highlightElements(
 
   // Filtering by selected elements if enabled
   if (newSelectorData.data.onlySelectedElements) {
-    // TODO
+    matchingElements = matchingElements.filter((el) => {
+      return el.getAttribute("selected") === "selected"
+    })
   }
 
   // Filtering by enabled elements if enabled
