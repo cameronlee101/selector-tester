@@ -1,8 +1,6 @@
 import React from "react"
 
-import "~style.css"
-
-import { MsgType, type HoverMatchingElementMsg, type Msg } from "~types"
+import { MsgType, type HoverMatchingElementMsg } from "~types"
 import { sendMsgToTab } from "~utils"
 
 function MatchingElementInfo(element: String, selectorId: number) {

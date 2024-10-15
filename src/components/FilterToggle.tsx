@@ -1,8 +1,13 @@
+import React from "react"
+
+import FilterOptionTooltip from "./FilterOptionTooltip"
+
 function FilterToggle(
   id: string,
   filterName: string,
   checked: boolean,
-  onChange: React.ChangeEventHandler<HTMLInputElement>
+  onChange: React.ChangeEventHandler<HTMLInputElement>,
+  tooltipText: string
 ) {
   return (
     <div className="flex items-center h-full my-0.5">
@@ -16,9 +21,10 @@ function FilterToggle(
       />
       <label
         htmlFor={id}
-        className="px-2 text-sm hover:cursor-pointer select-none w-fit">
+        className="flex pl-2 pr-1 text-sm hover:cursor-pointer select-none w-fit">
         {filterName}
       </label>
+      <span>{FilterOptionTooltip(tooltipText)}</span>
     </div>
   )
 }

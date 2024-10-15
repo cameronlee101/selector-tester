@@ -18,7 +18,6 @@ import { sendMsgToTab } from "~utils"
 export type FormData = {
   selector: string
   onlyDisplayedElements: boolean
-  onlyVisibleElements: boolean
   onlySelectedElements: boolean
   onlyEnabledElements: boolean
 }
@@ -27,7 +26,6 @@ function IndexSidePanel() {
   const [formData, setFormData] = useState<FormData>({
     selector: "",
     onlyDisplayedElements: false,
-    onlyVisibleElements: false,
     onlySelectedElements: false,
     onlyEnabledElements: false
   })
@@ -102,17 +100,8 @@ function IndexSidePanel() {
             setFormData({
               ...formData,
               onlyDisplayedElements: e.target.checked
-            })
-        )}
-        {FilterToggle(
-          "visibleElements",
-          "Visible",
-          formData.onlyVisibleElements,
-          (e) =>
-            setFormData({
-              ...formData,
-              onlyVisibleElements: e.target.checked
-            })
+            }),
+          "Only find elements that are visible and clickable on this page, similar to Selenium's isDisplayed() function"
         )}
         {FilterToggle(
           "selectedElements",
@@ -122,7 +111,8 @@ function IndexSidePanel() {
             setFormData({
               ...formData,
               onlySelectedElements: e.target.checked
-            })
+            }),
+          "Only find elements that have been selected, similar to Selenium's isSelected() function"
         )}
         {FilterToggle(
           "enabledElements",
@@ -132,7 +122,8 @@ function IndexSidePanel() {
             setFormData({
               ...formData,
               onlyEnabledElements: e.target.checked
-            })
+            }),
+          "Only find elements that are enabled, similar to Selenium's isEnabled() function"
         )}
       </>
     )

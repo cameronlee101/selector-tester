@@ -82,18 +82,6 @@ function highlightElements(
     })
   }
 
-  // Filtering by visible elements if enabled
-  if (newSelectorData.data.onlyVisibleElements) {
-    matchingElements = matchingElements.filter((el) => {
-      const style = el.style
-      return (
-        style.display != "none" &&
-        style.visibility != "hidden" &&
-        style.opacity != "0"
-      )
-    })
-  }
-
   // Filtering by selected elements if enabled
   if (newSelectorData.data.onlySelectedElements) {
     matchingElements = matchingElements.filter((el) => {
