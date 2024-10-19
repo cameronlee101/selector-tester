@@ -34,6 +34,8 @@ function IndexSidePanel() {
   const [selectorType, setSelectorType] = useState<SelectorType>(
     SelectorType.NONE
   )
+  const [matchElCountBGTailwind, setMatchElCountBGTailwind] =
+    useState<string>("")
 
   chrome.runtime.onMessage.addListener((msg: Msg, sender, sendResponse) => {
     if (msg.type === MsgType.MATCHING_ELEMENTS) {
@@ -41,6 +43,16 @@ function IndexSidePanel() {
       const elements: string[] = typedMsg.data.elements
 
       setMatchingElements(elements)
+      if (elements.length === 1) {
+        setMatchElCountBGTailwind("bg-green-300")
+      } else if (elements.length === 0 && formData.selector === "") {
+        setMatchElCountBGTailwind("")
+      } else if (
+        elements.length > 2 ||
+        (elements.length === 0 && formData.selector !== "")
+      ) {
+        setMatchElCountBGTailwind("bg-red-300")
+      }
     }
   })
 
@@ -99,7 +111,7 @@ function IndexSidePanel() {
               ...formData,
               onlyDisplayedElements: e.target.checked
             }),
-          "Only find elements that are visible and clickable on this page, similar to Selenium's isDisplayed() function"
+          "Only find elements that are displayed on this page, similar to Selenium's isDisplayed() function"
         )}
         {FilterToggle(
           "Selected",
@@ -128,7 +140,7 @@ function IndexSidePanel() {
   return (
     <NextUIProvider>
       <main className="p-3 h-screen flex flex-col">
-        <div className="my-3 space-y-2">
+        <div className="mb-3">
           <form
             className="flex flex-col mb-2"
             onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
@@ -138,14 +150,9 @@ function IndexSidePanel() {
             <Input
               type="text"
               label="Selector"
-              variant="bordered"
+              variant="faded"
               description={"Detected selector type: " + selectorType}
               className="text-gray-700"
-              classNames={{
-                inputWrapper: ["bg-gray-100"],
-                label: ["text-gray-600"],
-                mainWrapper: ["border-gray-700"]
-              }}
               onValueChange={(e) =>
                 setFormData({
                   ...formData,
@@ -162,7 +169,7 @@ function IndexSidePanel() {
             />
             <div className="flex mt-2 w-full">
               <div className="flex flex-col w-1/2">
-                <p className="text-sm mb-0.5">Filters:</p>
+                <p className="text-sm mb-0.5 underline ml-7">Filters</p>
                 {renderFilterList()}
               </div>
               <div className="flex w-1/2 justify-end gap-x-2">
@@ -170,8 +177,8 @@ function IndexSidePanel() {
                   type="submit"
                   size="sm"
                   radius="md"
-                  data-focus="false"
-                  data-focus-visible="false">
+                  className="text-sm"
+                  variant="shadow">
                   Search
                 </Button>
                 <Button
@@ -179,7 +186,8 @@ function IndexSidePanel() {
                   type="button"
                   size="sm"
                   radius="md"
-                  color="default">
+                  className="text-sm"
+                  variant="shadow">
                   Clear
                 </Button>
               </div>
@@ -188,11 +196,7 @@ function IndexSidePanel() {
           <p
             className={classNames(
               "text-sm px-1 w-fit rounded-md",
-              matchingElements.length === 1
-                ? "bg-green-300"
-                : matchingElements.length === 0
-                  ? ""
-                  : "bg-red-300"
+              matchElCountBGTailwind
             )}>
             Number of matching elements: {matchingElements.length}
           </p>

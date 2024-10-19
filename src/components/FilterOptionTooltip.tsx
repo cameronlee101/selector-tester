@@ -18,11 +18,11 @@ function FilterOptionTooltip(text: string) {
       {/* tooltip text */}
       <div
         className={classNames(
-          "absolute bottom-6 left-1/2 -translate-x-1/2 px-2 py-1 w-40 bg-gray-800 text-white text-xs rounded-lg",
+          "absolute bottom-6 left-1/2 -translate-x-1/2 px-2 py-1 w-40 bg-gray-700 text-white text-xs rounded-lg",
           isHoverOver ? "block" : "hidden"
         )}>
         <span>{text}</span>
-        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 -z-10 w-3 h-3 rotate-45 bg-gray-800"></div>
+        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 -z-10 w-3 h-3 rotate-45 bg-gray-700"></div>
       </div>
     </div>
   )

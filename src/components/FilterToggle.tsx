@@ -10,13 +10,13 @@ function FilterToggle(
   tooltipText: string
 ): ReactNode {
   return (
-    <div className="flex items-center my-0.5">
+    <div className="flex items-center my-1">
       <Checkbox
         checked={checked}
         onChange={onChange}
         color="default"
         className="p-0 m-0">
-        <div className="flex gap-x-1">
+        <div className="flex text-sm gap-x-1">
           {filterName}
           {FilterOptionTooltip(tooltipText)}
         </div>
