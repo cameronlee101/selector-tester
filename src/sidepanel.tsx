@@ -1,7 +1,8 @@
-import React, { useState, type FormEvent } from "react"
+import React, { useState, type FormEvent, type KeyboardEvent } from "react"
 
 import "~style.css"
 
+import { Button, Input, NextUIProvider } from "@nextui-org/react"
 import classNames from "classnames"
 
 import FilterToggle from "~components/FilterToggle"
@@ -48,9 +49,7 @@ function IndexSidePanel() {
     return xpathPattern.test(selector)
   }
 
-  function submitSelector(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-
+  function submitSelector() {
     let curSelectorType: SelectorType = SelectorType.NONE
     if (formData.selector) {
       curSelectorType = isXPath(formData.selector)
@@ -93,7 +92,6 @@ function IndexSidePanel() {
     return (
       <>
         {FilterToggle(
-          "displayedElements",
           "Displayed",
           formData.onlyDisplayedElements,
           (e) =>
@@ -104,7 +102,6 @@ function IndexSidePanel() {
           "Only find elements that are visible and clickable on this page, similar to Selenium's isDisplayed() function"
         )}
         {FilterToggle(
-          "selectedElements",
           "Selected",
           formData.onlySelectedElements,
           (e) =>
@@ -115,7 +112,6 @@ function IndexSidePanel() {
           "Only find elements that have been selected, similar to Selenium's isSelected() function"
         )}
         {FilterToggle(
-          "enabledElements",
           "Enabled",
           formData.onlyEnabledElements,
           (e) =>
@@ -130,60 +126,84 @@ function IndexSidePanel() {
   }
 
   return (
-    <main className="p-3 h-screen flex flex-col">
-      <h2 className="text-2xl font-semibold">Selector-Tester Extension</h2>
-      <div className="my-6 space-y-2">
-        <form onSubmit={submitSelector} className="flex flex-col mb-2">
-          <input
-            type="text"
-            className="border-2 border-gray-400 rounded-md p-0.5 focus:border-gray-900 text-sm"
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                selector: e.target.value
-              })
-            }
-            value={formData.selector}
-          />
-          <div className="flex mt-2 w-full">
-            <div className="flex flex-col w-1/2">
-              <p className="text-sm mb-0.5">Filters:</p>
-              {renderFilterList()}
+    <NextUIProvider>
+      <main className="p-3 h-screen flex flex-col">
+        <div className="my-3 space-y-2">
+          <form
+            className="flex flex-col mb-2"
+            onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
+              e.preventDefault()
+              submitSelector()
+            }}>
+            <Input
+              type="text"
+              label="Selector"
+              variant="bordered"
+              description={"Detected selector type: " + selectorType}
+              className="text-gray-700"
+              classNames={{
+                inputWrapper: ["bg-gray-100"],
+                label: ["text-gray-600"],
+                mainWrapper: ["border-gray-700"]
+              }}
+              onValueChange={(e) =>
+                setFormData({
+                  ...formData,
+                  selector: e.valueOf()
+                })
+              }
+              onKeyDown={(e: KeyboardEvent) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  submitSelector()
+                }
+              }}
+              value={formData.selector}
+            />
+            <div className="flex mt-2 w-full">
+              <div className="flex flex-col w-1/2">
+                <p className="text-sm mb-0.5">Filters:</p>
+                {renderFilterList()}
+              </div>
+              <div className="flex w-1/2 justify-end gap-x-2">
+                <Button
+                  type="submit"
+                  size="sm"
+                  radius="md"
+                  data-focus="false"
+                  data-focus-visible="false">
+                  Search
+                </Button>
+                <Button
+                  onClick={clearAll}
+                  type="button"
+                  size="sm"
+                  radius="md"
+                  color="default">
+                  Clear
+                </Button>
+              </div>
             </div>
-            <div className="flex w-1/2 justify-end gap-x-2">
-              <button
-                className="bg-gray-200 p-1.5 py-0.5 w-fit h-fit rounded-lg text-sm border-gray-500 border-2 active:bg-gray-500"
-                type="submit">
-                Search
-              </button>
-              <button
-                className="bg-gray-200 p-1.5 py-0.5 w-fit h-fit rounded-lg text-sm border-gray-500 border-2 active:bg-gray-500"
-                onClick={clearAll}
-                type="button">
-                Clear
-              </button>
-            </div>
-          </div>
-        </form>
-        <p className="px-1">Detected selector type: {selectorType}</p>
-        <p
-          className={classNames(
-            "text-sm px-1 w-fit rounded-md",
-            matchingElements.length === 1
-              ? "bg-green-300"
-              : matchingElements.length === 0
-                ? ""
-                : "bg-red-300"
-          )}>
-          Number of matching elements: {matchingElements.length}
-        </p>
-      </div>
-      <div className="overflow-y-scroll overflow-x-clip">
-        {matchingElements.map((el, selectorId) =>
-          MatchingElementInfo(el, selectorId)
-        )}
-      </div>
-    </main>
+          </form>
+          <p
+            className={classNames(
+              "text-sm px-1 w-fit rounded-md",
+              matchingElements.length === 1
+                ? "bg-green-300"
+                : matchingElements.length === 0
+                  ? ""
+                  : "bg-red-300"
+            )}>
+            Number of matching elements: {matchingElements.length}
+          </p>
+        </div>
+        <div className="overflow-y-scroll overflow-x-clip">
+          {matchingElements.map((el, selectorId) =>
+            MatchingElementInfo(el, selectorId)
+          )}
+        </div>
+      </main>
+    </NextUIProvider>
   )
 }
 

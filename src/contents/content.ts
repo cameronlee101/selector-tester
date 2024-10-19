@@ -64,21 +64,29 @@ function highlightElements(
   // Filtering by displayed elements if enabled
   if (newSelectorData.data.onlyDisplayedElements) {
     matchingElements = matchingElements.filter((el) => {
-      // Check if element is part of the DOM and visible (offsetWidth and offsetHeight > 0)
-      const isVisible = el.offsetWidth > 0 && el.offsetHeight > 0
+      const style = window.getComputedStyle(el)
 
-      // Check for computed styles: 'display' and 'visibility'
-      const computedStyle = window.getComputedStyle(el)
-      const isDisplayed =
-        computedStyle.display !== "none" &&
-        computedStyle.visibility !== "hidden"
+      // Check if the element or its parent has display: none
+      if (
+        style.display === "none" ||
+        style.visibility === "hidden" ||
+        style.opacity === "0"
+      ) {
+        return false
+      }
 
-      // Check if the element can be clicked: Not disabled and pointer-events are not set to none
-      const isClickable =
-        computedStyle.pointerEvents !== "none" && !el.hasAttribute("disabled")
+      // Check if the element has a non-zero size
+      const rect = el.getBoundingClientRect()
+      if (rect.width === 0 && rect.height === 0) {
+        return false
+      }
 
-      // Element is considered displayed and clickable if all conditions are met
-      return isVisible && isDisplayed && isClickable
+      // Check if the element is not in the DOM
+      if (!document.body.contains(el)) {
+        return false
+      }
+
+      return true
     })
   }
 
