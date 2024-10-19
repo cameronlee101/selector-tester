@@ -1,7 +1,7 @@
 {
   "name": "selector-tester",
   "displayName": "Selector tester",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "a simple extension to test your css or xpath selectors",
   "author": "cameron",
   "scripts": {
@@ -34,12 +34,11 @@
   },
   "manifest": {
     "host_permissions": [
-      "https://*/*"
+      "<all_urls>"
     ],
     "permissions": [
       "scripting",
       "activeTab",
-      "tabs",
       "sidePanel"
     ]
   }
