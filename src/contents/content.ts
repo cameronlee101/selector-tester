@@ -49,11 +49,19 @@ function highlightElements(
   const selector = newSelectorData.data.selector
 
   let matchingElements: HTMLElement[]
-  if (newSelectorData.data.selectorType === SelectorType.XPATH) {
-    matchingElements = getElementsByXPath(selector)
-  } else if (newSelectorData.data.selectorType === SelectorType.CSS) {
-    matchingElements = getElementsByCSS(selector)
-  } else {
+  try {
+    if (newSelectorData.data.selectorType === SelectorType.XPATH) {
+      matchingElements = getElementsByXPath(selector)
+    } else if (newSelectorData.data.selectorType === SelectorType.CSS) {
+      matchingElements = getElementsByCSS(selector)
+    } else {
+      return {
+        data: {
+          elements: []
+        }
+      }
+    }
+  } catch {
     return {
       data: {
         elements: []
