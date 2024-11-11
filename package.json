@@ -1,7 +1,7 @@
 {
   "name": "selector-tester",
   "displayName": "Selector tester",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "a simple extension to test your css or xpath selectors",
   "author": "cameron",
   "scripts": {
@@ -12,7 +12,10 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "plasmo": "0.89.1",
+    "@nextui-org/react": "^2.4.8",
+    "classnames": "^2.5.1",
+    "framer-motion": "^11.11.9",
+    "plasmo": "0.89.3",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
@@ -31,12 +34,11 @@
   },
   "manifest": {
     "host_permissions": [
-      "https://*/*"
+      "<all_urls>"
     ],
     "permissions": [
       "scripting",
       "activeTab",
-      "tabs",
       "sidePanel"
     ]
   }

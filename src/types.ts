@@ -19,6 +19,9 @@ export type NewSelectorData = {
   data: {
     selectorType: SelectorType
     selector: string
+    onlyDisplayedElements: boolean
+    onlySelectedElements: boolean
+    onlyEnabledElements: boolean
   }
 }
 

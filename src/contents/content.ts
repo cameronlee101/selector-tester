@@ -6,7 +6,7 @@ import {
   type Msg,
   type NewSelectorData,
   type NewSelectorMsg
-} from "~/types"
+} from "~types"
 
 const highlightAttrStr = "selector-id"
 
@@ -49,11 +49,19 @@ function highlightElements(
   const selector = newSelectorData.data.selector
 
   let matchingElements: HTMLElement[]
-  if (newSelectorData.data.selectorType === SelectorType.XPATH) {
-    matchingElements = getElementsByXPath(selector)
-  } else if (newSelectorData.data.selectorType === SelectorType.CSS) {
-    matchingElements = getElementsByCSS(selector)
-  } else {
+  try {
+    if (newSelectorData.data.selectorType === SelectorType.XPATH) {
+      matchingElements = getElementsByXPath(selector)
+    } else if (newSelectorData.data.selectorType === SelectorType.CSS) {
+      matchingElements = getElementsByCSS(selector)
+    } else {
+      return {
+        data: {
+          elements: []
+        }
+      }
+    }
+  } catch {
     return {
       data: {
         elements: []
@@ -61,11 +69,56 @@ function highlightElements(
     }
   }
 
+  // Filtering by displayed elements if enabled
+  if (newSelectorData.data.onlyDisplayedElements) {
+    matchingElements = matchingElements.filter((el) => {
+      const style = window.getComputedStyle(el)
+
+      // Check if the element or its parent has display: none
+      if (
+        style.display === "none" ||
+        style.visibility === "hidden" ||
+        style.opacity === "0"
+      ) {
+        return false
+      }
+
+      // Check if the element has a non-zero size
+      const rect = el.getBoundingClientRect()
+      if (rect.width === 0 && rect.height === 0) {
+        return false
+      }
+
+      // Check if the element is not in the DOM
+      if (!document.body.contains(el)) {
+        return false
+      }
+
+      return true
+    })
+  }
+
+  // Filtering by selected elements if enabled
+  if (newSelectorData.data.onlySelectedElements) {
+    matchingElements = matchingElements.filter((el) => {
+      return el.getAttribute("selected") === "selected"
+    })
+  }
+
+  // Filtering by enabled elements if enabled
+  if (newSelectorData.data.onlyEnabledElements) {
+    matchingElements = matchingElements.filter((el) => {
+      return !(el.getAttribute("disabled") === "disabled")
+    })
+  }
+
+  // Outlining matching elements
   for (let i = 0; i < matchingElements.length; i++) {
     matchingElements[i].style.outline = "3px solid orange"
     matchingElements[i].setAttribute(highlightAttrStr, i.toString())
   }
 
+  // Return matching element data in the form of <>...</>
   return {
     data: {
       elements: matchingElements.map((el) => getOutermostElementStr(el))
