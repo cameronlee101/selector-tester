@@ -1,9 +1,9 @@
 {
   "name": "selector-tester",
-  "displayName": "Selector tester",
+  "displayName": "Selector Tester",
   "version": "1.0.0",
-  "description": "a simple extension to test your css or xpath selectors",
-  "author": "cameron",
+  "description": "A simple extension to test your CSS and XPath selectors",
+  "author": "Cameron",
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
