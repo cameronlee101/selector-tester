@@ -37,7 +37,6 @@
       "<all_urls>"
     ],
     "permissions": [
-      "scripting",
       "activeTab",
       "sidePanel"
     ]
